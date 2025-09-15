@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:juskar/models/order.dart';
-import 'package:juskar/services/mock_data_service.dart';
+import 'package:juskar/models/order.dart' as OrderModel;
+import 'package:juskar/services/firebase_order_service.dart';
 import 'package:juskar/widgets/order_card.dart';
 import 'package:juskar/utils/order_sort_option.dart';
 
@@ -14,86 +14,93 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   bool _showPendingOrders = true;
   bool _showCompletedOrders = true;
-  List<Order> _allOrders = [];
   String _searchQuery = '';
   OrderSortOption _currentSortOption = OrderSortOption.fecha;
 
-  @override
-  void initState() {
-    super.initState();
-    _loadOrders();
-  }
+  List<OrderModel.Order> _filterAndSortOrders(List<OrderModel.Order> orders) {
+    // Filtrar por búsqueda
+    var filteredOrders = orders.where((order) {
+      if (_searchQuery.isEmpty) return true;
+      return order.pedidoCliente.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+             order.pedidoDetalle.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+             order.pedidoLeyenda.toLowerCase().contains(_searchQuery.toLowerCase());
+    }).toList();
 
-  void _loadOrders() {
-    setState(() {
-      _allOrders = MockDataService.getOrders();
-    });
-  }
-
-  void _toggleOrderCompletion(String orderId) {
-    setState(() {
-      MockDataService.toggleOrderCompletion(orderId);
-      _loadOrders(); // Recargar la lista
-    });
-  }
-
-  List<Order> _sortOrders(List<Order> orders) {
-    List<Order> sortedOrders = List.from(orders);
-    
+    // Ordenar según la opción seleccionada
     switch (_currentSortOption) {
       case OrderSortOption.fecha:
-        sortedOrders.sort((a, b) => a.fecha.compareTo(b.fecha));
+        filteredOrders.sort((a, b) => a.pedidoFecha.compareTo(b.pedidoFecha));
         break;
       case OrderSortOption.categoria:
-        sortedOrders.sort((a, b) => a.categoria.name.compareTo(b.categoria.name));
+        filteredOrders.sort((a, b) => a.pedidoCategoria.compareTo(b.pedidoCategoria));
         break;
       case OrderSortOption.precio:
-        sortedOrders.sort((a, b) => b.valor.compareTo(a.valor)); // Mayor a menor
+        filteredOrders.sort((a, b) => b.pedidoValor.compareTo(a.pedidoValor)); // Mayor a menor
         break;
       case OrderSortOption.cliente:
-        sortedOrders.sort((a, b) => a.cliente.compareTo(b.cliente));
+        filteredOrders.sort((a, b) => a.pedidoCliente.compareTo(b.pedidoCliente));
         break;
     }
     
-    return sortedOrders;
+    return filteredOrders;
   }
 
-  List<Order> get _pendingOrders {
-    var orders = _allOrders.where((order) => !order.completado).toList();
-    if (_searchQuery.isNotEmpty) {
-      orders = orders.where((order) =>
-          order.titulo.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          order.cliente.toLowerCase().contains(_searchQuery.toLowerCase())
-      ).toList();
+  Future<void> _toggleOrderCompletion(String orderId, bool completed) async {
+    try {
+      await FirebaseOrderService.toggleOrderStatus(orderId, completed);
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(completed ? 'Pedido marcado como completado' : 'Pedido marcado como pendiente'),
+            backgroundColor: completed ? Colors.green : Colors.orange,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al actualizar pedido: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
-    return _sortOrders(orders);
-  }
-
-  List<Order> get _completedOrders {
-    var orders = _allOrders.where((order) => order.completado).toList();
-    if (_searchQuery.isNotEmpty) {
-      orders = orders.where((order) =>
-          order.titulo.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          order.cliente.toLowerCase().contains(_searchQuery.toLowerCase())
-      ).toList();
-    }
-    return _sortOrders(orders);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Página Principal'),
+        title: const Text('Pedidos'),
         centerTitle: true,
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: CircleAvatar(
-              radius: 20,
-              backgroundImage: const AssetImage('assets/Logo.jpg'),
-              backgroundColor: Colors.grey[800],
-            ),
+          PopupMenuButton<OrderSortOption>(
+            icon: const Icon(Icons.sort),
+            onSelected: (OrderSortOption option) {
+              setState(() {
+                _currentSortOption = option;
+              });
+            },
+            itemBuilder: (BuildContext context) => [
+              const PopupMenuItem(
+                value: OrderSortOption.fecha,
+                child: Text('Ordenar por fecha'),
+              ),
+              const PopupMenuItem(
+                value: OrderSortOption.categoria,
+                child: Text('Ordenar por categoría'),
+              ),
+              const PopupMenuItem(
+                value: OrderSortOption.precio,
+                child: Text('Ordenar por precio'),
+              ),
+              const PopupMenuItem(
+                value: OrderSortOption.cliente,
+                child: Text('Ordenar por cliente'),
+              ),
+            ],
           ),
         ],
       ),
@@ -105,109 +112,150 @@ class _HomePageState extends State<HomePage> {
             child: TextField(
               onChanged: (value) {
                 setState(() {
-                  _searchQuery = value;
+                  _searchQuery = value.toLowerCase();
                 });
               },
+              style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
-                hintText: 'Buscar pedido...',
-                prefixIcon: const Icon(Icons.search),
+                hintText: 'Buscar pedidos...',
+                hintStyle: TextStyle(color: Colors.grey[400]),
+                prefixIcon: Icon(Icons.search, color: Colors.grey[400]),
                 filled: true,
                 fillColor: const Color(0xFF333333),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
                 ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
               ),
             ),
           ),
-
-          // Dropdown de ordenamiento
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: Row(
-              children: [
-                Text(
-                  'Ordenar por:',
-                  style: TextStyle(
-                    color: Colors.grey[400],
-                    fontSize: 14,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF333333),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<OrderSortOption>(
-                      value: _currentSortOption,
-                      dropdownColor: const Color(0xFF333333),
-                      style: const TextStyle(color: Colors.white),
-                      icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
-                      items: OrderSortOption.values.map((OrderSortOption option) {
-                        return DropdownMenuItem<OrderSortOption>(
-                          value: option,
-                          child: Text(option.displayName),
-                        );
-                      }).toList(),
-                      onChanged: (OrderSortOption? newValue) {
-                        if (newValue != null) {
-                          setState(() {
-                            _currentSortOption = newValue;
-                          });
-                        }
-                      },
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Lista de pedidos
+          
+          // Contenido principal con StreamBuilder
           Expanded(
-            child: ListView(
-              children: [
-                // Sección "Por hacer"
-                _buildSectionHeader(
-                  title: 'Por hacer',
-                  count: _pendingOrders.length,
-                  isExpanded: _showPendingOrders,
-                  onToggle: () {
-                    setState(() {
-                      _showPendingOrders = !_showPendingOrders;
-                    });
-                  },
-                ),
-                if (_showPendingOrders) ...[
-                  ..._pendingOrders.map((order) => OrderCard(
-                    order: order,
-                    onToggleCompletion: () => _toggleOrderCompletion(order.id),
-                  )),
-                ],
+            child: StreamBuilder<List<OrderModel.Order>>(
+              stream: FirebaseOrderService.getOrders(),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.error_outline,
+                          size: 64,
+                          color: Colors.red[400],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Error al cargar pedidos',
+                          style: Theme.of(context).textTheme.headlineSmall,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          snapshot.error.toString(),
+                          style: TextStyle(color: Colors.grey[400]),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  );
+                }
 
-                const SizedBox(height: 20),
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
 
-                // Sección "Completado"
-                _buildSectionHeader(
-                  title: 'Completado',
-                  count: _completedOrders.length,
-                  isExpanded: _showCompletedOrders,
-                  onToggle: () {
-                    setState(() {
-                      _showCompletedOrders = !_showCompletedOrders;
-                    });
+                final allOrders = snapshot.data ?? [];
+                
+                if (allOrders.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.receipt_long_outlined,
+                          size: 64,
+                          color: Colors.grey[400],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No hay pedidos',
+                          style: Theme.of(context).textTheme.headlineSmall,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Los pedidos aparecerán aquí cuando se agreguen',
+                          style: TextStyle(color: Colors.grey[400]),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                // Filtrar y ordenar pedidos
+                final filteredOrders = _filterAndSortOrders(allOrders);
+                final pendingOrders = filteredOrders.where((order) => !order.pedidoCompleto).toList();
+                final completedOrders = filteredOrders.where((order) => order.pedidoCompleto).toList();
+
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    // Los datos se actualizan automáticamente con el Stream
+                    await Future.delayed(const Duration(milliseconds: 500));
                   },
-                ),
-                if (_showCompletedOrders) ...[
-                  ..._completedOrders.map((order) => OrderCard(
-                    order: order,
-                    onToggleCompletion: () => _toggleOrderCompletion(order.id),
-                  )),
-                ],
-              ],
+                  child: ListView(
+                    children: [
+                      // Sección "Por hacer"
+                      if (pendingOrders.isNotEmpty)
+                        _buildSectionHeader(
+                          'Por hacer',
+                          pendingOrders.length,
+                          () {
+                            setState(() {
+                              _showPendingOrders = !_showPendingOrders;
+                            });
+                          },
+                          _showPendingOrders,
+                        ),
+                      
+                      if (_showPendingOrders)
+                        ...pendingOrders.map((order) => OrderCard(
+                          order: order,
+                          onToggleCompletion: () => _toggleOrderCompletion(order.id, !order.pedidoCompleto),
+                        )),
+
+                      if (pendingOrders.isNotEmpty && completedOrders.isNotEmpty)
+                        const SizedBox(height: 16),
+
+                      // Sección "Completado"
+                      if (completedOrders.isNotEmpty)
+                        _buildSectionHeader(
+                          'Completado',
+                          completedOrders.length,
+                          () {
+                            setState(() {
+                              _showCompletedOrders = !_showCompletedOrders;
+                            });
+                          },
+                          _showCompletedOrders,
+                        ),
+                      
+                      if (_showCompletedOrders)
+                        ...completedOrders.map((order) => OrderCard(
+                          order: order,
+                          onToggleCompletion: () => _toggleOrderCompletion(order.id, !order.pedidoCompleto),
+                        )),
+
+                      const SizedBox(height: 16),
+                    ],
+                  ),
+                );
+              },
             ),
           ),
         ],
@@ -215,34 +263,34 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildSectionHeader({
-    required String title,
-    required int count,
-    required bool isExpanded,
-    required VoidCallback onToggle,
-  }) {
+  Widget _buildSectionHeader(String title, int count, VoidCallback onTap, bool isExpanded) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: InkWell(
-        onTap: onToggle,
+        onTap: onTap,
         borderRadius: BorderRadius.circular(8),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           decoration: BoxDecoration(
             color: const Color(0xFF333333),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
             children: [
+              Icon(
+                isExpanded ? Icons.expand_less : Icons.expand_more,
+                color: const Color(0xFF7C7BFF),
+              ),
+              const SizedBox(width: 8),
               Text(
-                title,
+                '$title ($count)',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(width: 8),
+              const Spacer(),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
@@ -250,18 +298,13 @@ class _HomePageState extends State<HomePage> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  count.toString(),
+                  '$count',
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 12,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-              ),
-              const Spacer(),
-              Icon(
-                isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                color: Colors.white,
               ),
             ],
           ),

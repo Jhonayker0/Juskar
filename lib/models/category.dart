@@ -1,29 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Category {
   final String id;
-  final String name;
+  final String nombre;
   final Color color;
 
   Category({
     required this.id,
-    required this.name,
+    required this.nombre,
     required this.color,
   });
 
   factory Category.fromJson(Map<String, dynamic> json) {
     return Category(
       id: json['id'],
-      name: json['name'],
+      nombre: json['nombre'],
       color: Color(json['color']),
+    );
+  }
+
+  factory Category.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return Category(
+      id: doc.id,
+      nombre: data['nombre'] ?? '',
+      color: Color(data['color'] ?? Colors.blue.value),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'name': name,
+      'nombre': nombre,
       'color': color.value,
+    };
+  }
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'nombre': nombre,
+      'color': color.value,
+      'updatedAt': FieldValue.serverTimestamp(),
     };
   }
 

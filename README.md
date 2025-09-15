@@ -32,7 +32,8 @@ lib/
 ├── widgets/
 │   └── order_card.dart       # Widget de tarjeta de pedido
 ├── services/
-│   └── mock_data_service.dart # Servicio de datos de prueba
+│   ├── firebase_category_service.dart # Servicio de categorías con Firebase
+│   └── firebase_order_service.dart    # Servicio de pedidos con Firebase
 ├── utils/
 │   └── app_theme.dart        # Tema y colores de la app
 └── main.dart                 # Punto de entrada
@@ -111,17 +112,6 @@ La aplicación incluye datos mockup para visualizar la funcionalidad:
 ## 👨‍💻 Desarrollo
 
 El proyecto está estructurado de manera modular para facilitar el desarrollo incremental. Cada funcionalidad se puede implementar de forma independiente.
-
-### Estado Actual: v1.0 (Básico)
-- ✅ Estructura base implementada
-- ✅ Interfaz visual completada
-- ✅ Datos mockup funcionando
-- 🔄 Funcionalidades básicas de navegación
-
-### Próxima Versión: v1.1 (Interactividad)
-- 🎯 Búsqueda y filtros funcionales
-- 🎯 Formulario de creación básico
-- 🎯 Edición de categorías
 
 ---
 
