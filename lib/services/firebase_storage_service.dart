@@ -8,6 +8,26 @@ class FirebaseStorageService {
   static final FirebaseStorage _storage = FirebaseStorage.instance;
   static const String _ordersFolder = 'orders';
 
+  /// Subir múltiples imágenes a Firebase Storage y retornar las URLs
+  static Future<List<String>> uploadOrderImages(List<File> imageFiles) async {
+    if (imageFiles.isEmpty) return [];
+    
+    try {
+      List<String> imageUrls = [];
+      
+      for (File imageFile in imageFiles) {
+        final url = await uploadOrderImage(imageFile);
+        if (url != null) {
+          imageUrls.add(url);
+        }
+      }
+      
+      return imageUrls;
+    } catch (e) {
+      throw Exception('Error al subir imágenes: $e');
+    }
+  }
+
   /// Subir imagen a Firebase Storage y retornar la URL
   static Future<String?> uploadOrderImage(File imageFile) async {
     try {

@@ -5,6 +5,7 @@ import 'package:juskar/models/category.dart';
 import 'package:juskar/services/firebase_order_service.dart';
 import 'package:juskar/services/firebase_category_service.dart';
 import 'package:juskar/services/firebase_storage_service.dart';
+import 'package:juskar/widgets/image_carousel.dart';
 
 class CreateOrderPage extends StatefulWidget {
   const CreateOrderPage({super.key});
@@ -33,9 +34,10 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
   String? _selectedCategoryId;
   Category? _selectedCategory;
   bool _pedidoConfirma = false;
-  File? _selectedImage;
+  List<File> _selectedImages = []; // Cambiado de File? a List<File>
   bool _isLoading = false;
   bool _isUploadingImage = false;
+  int _currentImageIndex = 0; // Para el carrusel
 
   @override
   void initState() {
@@ -99,7 +101,7 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
       if (mounted) {
         setState(() {
           if (image != null) {
-            _selectedImage = image;
+            _selectedImages.add(image);
           }
           _isUploadingImage = false;
         });
@@ -117,6 +119,20 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
           ),
         );
       }
+    }
+  }
+
+  void _removeImage(int index) {
+    if (index >= 0 && index < _selectedImages.length) {
+      setState(() {
+        _selectedImages.removeAt(index);
+        // Ajustar el índice actual si es necesario
+        if (_currentImageIndex >= _selectedImages.length && _selectedImages.isNotEmpty) {
+          _currentImageIndex = _selectedImages.length - 1;
+        } else if (_selectedImages.isEmpty) {
+          _currentImageIndex = 0;
+        }
+      });
     }
   }
 
@@ -259,7 +275,8 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
       _selectedCategoryId = null;
       _selectedCategory = null;
       _pedidoConfirma = false;
-      _selectedImage = null;
+      _selectedImages.clear();
+      _currentImageIndex = 0;
     });
   }
 
@@ -283,17 +300,17 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
     });
 
     try {
-      String? imageUrl;
+      List<String> imageUrls = [];
       
-      // Subir imagen si fue seleccionada
-      if (_selectedImage != null) {
-        imageUrl = await FirebaseStorageService.uploadOrderImage(_selectedImage!);
+      // Subir imágenes si fueron seleccionadas
+      if (_selectedImages.isNotEmpty) {
+        imageUrls = await FirebaseStorageService.uploadOrderImages(_selectedImages);
       }
 
       // Crear el pedido
       final order = order_model.Order(
         id: '', // Se generará automáticamente
-        imageFoto: imageUrl,
+        imagenesUrls: imageUrls,
         pedidoAbono: double.tryParse(_abonoController.text) ?? 0.0,
         pedidoCliente: _clienteController.text.trim(),
         pedidoCompleto: false, // Nuevo pedido siempre pendiente
@@ -729,79 +746,13 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
           ],
         ),
         const SizedBox(height: 12),
-        GestureDetector(
-          onTap: _isUploadingImage ? null : _selectImage,
-          child: Container(
-            width: double.infinity,
-            height: 200,
-            decoration: BoxDecoration(
-              color: const Color(0xFF333333),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.white24),
-            ),
-            child: _isUploadingImage
-                ? const Center(
-                    child: CircularProgressIndicator(
-                      color: Color(0xFF7C7BFF),
-                    ),
-                  )
-                : _selectedImage != null
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.file(
-                          _selectedImage!,
-                          fit: BoxFit.cover,
-                        ),
-                      )
-                    : const Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.add_photo_alternate,
-                            size: 48,
-                            color: Colors.white54,
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            'Toca para agregar imagen',
-                            style: TextStyle(
-                              color: Colors.white54,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
-                      ),
-          ),
+        // Carrusel de imágenes
+        ImageCarousel(
+          images: _selectedImages,
+          onAddImage: _selectImage,
+          onRemoveImage: _removeImage,
+          isLoading: _isUploadingImage,
         ),
-        if (_selectedImage != null)
-          Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: Row(
-              children: [
-                TextButton.icon(
-                  onPressed: _selectImage,
-                  icon: const Icon(Icons.edit, color: Color(0xFF7C7BFF)),
-                  label: const Text(
-                    'Cambiar imagen',
-                    style: TextStyle(color: Color(0xFF7C7BFF)),
-                  ),
-                ),
-                const Spacer(),
-                TextButton.icon(
-                  onPressed: () {
-                    setState(() {
-                      _selectedImage = null;
-                    });
-                  },
-                  icon: const Icon(Icons.delete, color: Colors.red),
-                  label: const Text(
-                    'Eliminar',
-                    style: TextStyle(color: Colors.red),
-                  ),
-                ),
-              ],
-            ),
-          ),
       ],
     );
   }
@@ -912,6 +863,6 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
            _valorController.text.isNotEmpty ||
            (_abonoController.text.isNotEmpty && _abonoController.text != '0') ||
            _selectedCategory != null ||
-           _selectedImage != null;
+           _selectedImages.isNotEmpty;
   }
 }
