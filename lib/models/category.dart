@@ -25,7 +25,7 @@ class Category {
     return Category(
       id: doc.id,
       nombre: data['nombre'] ?? '',
-      color: Color(data['color'] ?? Colors.blue.value),
+      color: Color(data['color'] ?? 0xFF2196F3),
     );
   }
 

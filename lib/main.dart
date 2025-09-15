@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:juskar/utils/app_theme.dart';
 import 'package:juskar/screens/main_layout.dart';
+import 'package:juskar/services/initial_data_service.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -10,8 +11,8 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   
-  // TEMPORAL: Agregar datos de prueba la primera vez
-  // await FirebaseTestData.addSampleOrders();
+  // Crear categorías por defecto si no existen
+  await InitialDataService.createDefaultCategories();
   
   runApp(const JuskarApp());
 }
