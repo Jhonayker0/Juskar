@@ -65,6 +65,7 @@ class _MainLayoutState extends State<MainLayout> {
       floatingActionButton: currentIndex == 1 ? null : Container(
         margin: const EdgeInsets.only(top: 30),
         child: FloatingActionButton(
+          heroTag: "main_fab", // Tag único para evitar conflictos
           onPressed: () {
             setState(() {
               currentIndex = 1;

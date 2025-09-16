@@ -134,6 +134,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: "categories_fab", // Tag único para evitar conflictos
         onPressed: _createCategory,
         child: const Icon(Icons.add),
       ),

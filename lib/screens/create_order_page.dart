@@ -8,7 +8,9 @@ import 'package:juskar/services/firebase_storage_service.dart';
 import 'package:juskar/widgets/image_carousel.dart';
 
 class CreateOrderPage extends StatefulWidget {
-  const CreateOrderPage({super.key});
+  final order_model.Order? orderToEdit;
+  
+  const CreateOrderPage({super.key, this.orderToEdit});
 
   @override
   State<CreateOrderPage> createState() => _CreateOrderPageState();
@@ -39,10 +41,34 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
   bool _isUploadingImage = false;
   int _currentImageIndex = 0; // Para el carrusel
 
+  // Modo edición
+  bool get isEditMode => widget.orderToEdit != null;
+
   @override
   void initState() {
     super.initState();
     _abonoController.text = '0';
+    
+    // Si estamos editando, prellenar los campos
+    if (isEditMode) {
+      _initializeForEdit();
+    }
+  }
+
+  void _initializeForEdit() {
+    final order = widget.orderToEdit!;
+    _tituloController.text = order.pedidoCliente;
+    _detalleController.text = order.pedidoDetalle;
+    _clienteController.text = order.pedidoCliente;
+    _contactoController.text = order.pedidoContacto;
+    _domicilioController.text = order.pedidoDomicilio;
+    _leyendaController.text = order.pedidoLeyenda;
+    _librasController.text = order.pedidoLibras;
+    _valorController.text = order.pedidoValor.toString();
+    _abonoController.text = order.pedidoAbono.toString();
+    _fechaEntrega = order.pedidoFecha;
+    _selectedCategoryId = order.pedidoCategoria;
+    _pedidoConfirma = order.pedidoConfirma;
   }
 
   @override
@@ -305,15 +331,18 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
       // Subir imágenes si fueron seleccionadas
       if (_selectedImages.isNotEmpty) {
         imageUrls = await FirebaseStorageService.uploadOrderImages(_selectedImages);
+      } else if (isEditMode) {
+        // Mantener las imágenes existentes si no se seleccionaron nuevas
+        imageUrls = widget.orderToEdit!.imagenesUrls;
       }
 
-      // Crear el pedido
+      // Crear o actualizar el pedido
       final order = order_model.Order(
-        id: '', // Se generará automáticamente
+        id: isEditMode ? widget.orderToEdit!.id : '', // Usar ID existente si editamos
         imagenesUrls: imageUrls,
         pedidoAbono: double.tryParse(_abonoController.text) ?? 0.0,
         pedidoCliente: _clienteController.text.trim(),
-        pedidoCompleto: false, // Nuevo pedido siempre pendiente
+        pedidoCompleto: isEditMode ? widget.orderToEdit!.pedidoCompleto : false, // Mantener estado si editamos
         pedidoConfirma: _pedidoConfirma,
         pedidoContacto: _contactoController.text.trim(),
         pedidoDetalle: _detalleController.text.trim(),
@@ -325,17 +354,88 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
         pedidoCategoria: _selectedCategoryId!,
       );
 
-      await FirebaseOrderService.addOrder(order);
+      if (isEditMode) {
+        await FirebaseOrderService.updateOrder(order);
+      } else {
+        await FirebaseOrderService.addOrder(order);
+      }
 
       if (mounted) {
-        _showMessage('Pedido creado exitosamente');
+        _showMessage(isEditMode ? 'Pedido actualizado exitosamente' : 'Pedido creado exitosamente');
         
-        // Limpiar formulario
-        _clearForm();
+        if (!isEditMode) {
+          // Solo limpiar formulario si estamos creando
+          _clearForm();
+        } else {
+          // Si estamos editando, volver a la pantalla anterior
+          Navigator.of(context).pop();
+        }
       }
     } catch (e) {
       if (mounted) {
-        _showMessage('Error al crear pedido: $e', isError: true);
+        _showMessage('Error al ${isEditMode ? 'actualizar' : 'crear'} pedido: $e', isError: true);
+      }
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _showDeleteConfirmation() async {
+    final bool? confirmDelete = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF2A2A2A),
+          title: const Text(
+            'Confirmar eliminación',
+            style: TextStyle(color: Colors.white),
+          ),
+          content: const Text(
+            '¿Estás seguro de que quieres eliminar este pedido? Esta acción no se puede deshacer.',
+            style: TextStyle(color: Colors.white70),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text(
+                'Cancelar',
+                style: TextStyle(color: Colors.white70),
+              ),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.red,
+              ),
+              child: const Text('Eliminar'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmDelete == true) {
+      await _deleteOrder();
+    }
+  }
+
+  Future<void> _deleteOrder() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      await FirebaseOrderService.deleteOrder(widget.orderToEdit!.id);
+      
+      if (mounted) {
+        _showMessage('Pedido eliminado exitosamente');
+        Navigator.of(context).pop(); // Volver a la pantalla anterior
+      }
+    } catch (e) {
+      if (mounted) {
+        _showMessage('Error al eliminar pedido: $e', isError: true);
       }
     } finally {
       setState(() {
@@ -361,7 +461,7 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
       canPop: true,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Crear Pedido'),
+          title: Text(isEditMode ? 'Editar Pedido' : 'Crear Pedido'),
           centerTitle: true,
         ),
       body: Form(
@@ -776,7 +876,41 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
         
         const SizedBox(height: 12),
 
-        // Botón crear pedido
+        // Botones de acción
+        if (isEditMode) ...[
+          // Botón eliminar pedido (solo en modo edición)
+          SizedBox(
+            width: double.infinity,
+            height: 50,
+            child: OutlinedButton(
+              onPressed: _isLoading ? null : _showDeleteConfirmation,
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.red,
+                side: const BorderSide(color: Colors.red),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.delete_outline, size: 20),
+                  SizedBox(width: 8),
+                  Text(
+                    'Eliminar Pedido',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
+
+        // Botón principal (crear/actualizar)
         SizedBox(
           width: double.infinity,
           height: 50,
@@ -791,9 +925,9 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
             ),
             child: _isLoading
                 ? const CircularProgressIndicator(color: Colors.white)
-                : const Text(
-                    'Crear Pedido',
-                    style: TextStyle(
+                : Text(
+                    isEditMode ? 'Actualizar Pedido' : 'Crear Pedido',
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),

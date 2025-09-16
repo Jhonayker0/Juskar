@@ -3,6 +3,7 @@ import 'package:juskar/models/order.dart' as OrderModel;
 import 'package:juskar/services/firebase_order_service.dart';
 import 'package:juskar/widgets/order_card.dart';
 import 'package:juskar/utils/order_sort_option.dart';
+import 'package:juskar/screens/create_order_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -67,6 +68,15 @@ class _HomePageState extends State<HomePage> {
         );
       }
     }
+  }
+
+  void _navigateToEditOrder(OrderModel.Order order) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CreateOrderPage(orderToEdit: order),
+      ),
+    );
   }
 
   @override
@@ -227,6 +237,7 @@ class _HomePageState extends State<HomePage> {
                         ...pendingOrders.map((order) => OrderCard(
                           order: order,
                           onToggleCompletion: () => _toggleOrderCompletion(order.id, !order.pedidoCompleto),
+                          onTap: () => _navigateToEditOrder(order),
                         )),
 
                       if (pendingOrders.isNotEmpty && completedOrders.isNotEmpty)
@@ -249,6 +260,7 @@ class _HomePageState extends State<HomePage> {
                         ...completedOrders.map((order) => OrderCard(
                           order: order,
                           onToggleCompletion: () => _toggleOrderCompletion(order.id, !order.pedidoCompleto),
+                          onTap: () => _navigateToEditOrder(order),
                         )),
 
                       const SizedBox(height: 16),
