@@ -36,7 +36,8 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
   String? _selectedCategoryId;
   Category? _selectedCategory;
   bool _pedidoConfirma = false;
-  List<File> _selectedImages = []; // Cambiado de File? a List<File>
+  List<File> _selectedImages = []; // Archivos locales nuevos
+  List<String> _existingImageUrls = []; // URLs de imágenes existentes
   bool _isLoading = false;
   bool _isUploadingImage = false;
   int _currentImageIndex = 0; // Para el carrusel
@@ -69,6 +70,9 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
     _fechaEntrega = order.pedidoFecha;
     _selectedCategoryId = order.pedidoCategoria;
     _pedidoConfirma = order.pedidoConfirma;
+    
+    // Cargar imágenes existentes
+    _existingImageUrls = List.from(order.imagenesUrls);
   }
 
   @override
@@ -158,6 +162,14 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
         } else if (_selectedImages.isEmpty) {
           _currentImageIndex = 0;
         }
+      });
+    }
+  }
+
+  void _removeImageUrl(int index) {
+    if (index >= 0 && index < _existingImageUrls.length) {
+      setState(() {
+        _existingImageUrls.removeAt(index);
       });
     }
   }
@@ -328,12 +340,20 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
     try {
       List<String> imageUrls = [];
       
-      // Subir imágenes si fueron seleccionadas
-      if (_selectedImages.isNotEmpty) {
-        imageUrls = await FirebaseStorageService.uploadOrderImages(_selectedImages);
-      } else if (isEditMode) {
-        // Mantener las imágenes existentes si no se seleccionaron nuevas
-        imageUrls = widget.orderToEdit!.imagenesUrls;
+      if (isEditMode) {
+        // Combinar imágenes existentes y nuevas
+        imageUrls = List<String>.from(_existingImageUrls);
+        
+        // Subir nuevas imágenes si fueron seleccionadas
+        if (_selectedImages.isNotEmpty) {
+          final newImageUrls = await FirebaseStorageService.uploadOrderImages(_selectedImages);
+          imageUrls.addAll(newImageUrls);
+        }
+      } else {
+        // Modo creación: solo subir imágenes nuevas
+        if (_selectedImages.isNotEmpty) {
+          imageUrls = await FirebaseStorageService.uploadOrderImages(_selectedImages);
+        }
       }
 
       // Crear o actualizar el pedido
@@ -849,8 +869,10 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
         // Carrusel de imágenes
         ImageCarousel(
           images: _selectedImages,
+          imageUrls: _existingImageUrls,
           onAddImage: _selectImage,
           onRemoveImage: _removeImage,
+          onRemoveUrl: _removeImageUrl,
           isLoading: _isUploadingImage,
         ),
       ],

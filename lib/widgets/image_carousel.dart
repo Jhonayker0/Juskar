@@ -3,15 +3,19 @@ import 'package:flutter/material.dart';
 
 class ImageCarousel extends StatefulWidget {
   final List<File> images;
+  final List<String> imageUrls; // URLs de imágenes existentes
   final VoidCallback? onAddImage;
   final void Function(int index)? onRemoveImage;
+  final void Function(int index)? onRemoveUrl; // Callback para remover URLs
   final bool isLoading;
 
   const ImageCarousel({
     Key? key,
     required this.images,
+    this.imageUrls = const [],
     this.onAddImage,
     this.onRemoveImage,
+    this.onRemoveUrl,
     this.isLoading = false,
   }) : super(key: key);
 
@@ -22,6 +26,10 @@ class ImageCarousel extends StatefulWidget {
 class _ImageCarouselState extends State<ImageCarousel> {
   int _currentIndex = 0;
   final PageController _pageController = PageController();
+
+  // Combinar ambas listas para obtener el total de imágenes
+  int get totalImages => widget.imageUrls.length + widget.images.length;
+  bool get hasImages => totalImages > 0;
 
   @override
   void dispose() {
@@ -47,7 +55,7 @@ class _ImageCarouselState extends State<ImageCarousel> {
                 color: Color(0xFF7C7BFF),
               ),
             )
-          : widget.images.isEmpty
+          : !hasImages
               ? _buildEmptyState()
               : Stack(
                   children: [
@@ -94,29 +102,67 @@ class _ImageCarouselState extends State<ImageCarousel> {
             _currentIndex = index;
           });
         },
-        itemCount: widget.images.length,
+        itemCount: totalImages,
         itemBuilder: (context, index) {
-          return Image.file(
-            widget.images[index],
-            fit: BoxFit.cover,
-          );
+          // Primero mostrar las URLs existentes, luego los archivos locales
+          if (index < widget.imageUrls.length) {
+            // Mostrar imagen desde URL
+            return Image.network(
+              widget.imageUrls[index],
+              fit: BoxFit.cover,
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                return const Center(
+                  child: CircularProgressIndicator(
+                    color: Color(0xFF7C7BFF),
+                  ),
+                );
+              },
+              errorBuilder: (context, error, stackTrace) {
+                return const Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.error_outline,
+                        color: Colors.red,
+                        size: 48,
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        'Error al cargar imagen',
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          } else {
+            // Mostrar archivo local
+            final localIndex = index - widget.imageUrls.length;
+            return Image.file(
+              widget.images[localIndex],
+              fit: BoxFit.cover,
+            );
+          }
         },
       ),
     );
   }
 
   Widget _buildNavigationButtons() {
-    if (widget.images.length <= 1) return const SizedBox();
+    if (totalImages <= 1) return const SizedBox();
 
     return Positioned.fill(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Botón anterior
-          if (_currentIndex > 0)
-            Positioned(
-              left: 8,
-              child: Container(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // Botón anterior
+            if (_currentIndex > 0)
+              Container(
                 decoration: const BoxDecoration(
                   color: Colors.black54,
                   shape: BoxShape.circle,
@@ -130,13 +176,12 @@ class _ImageCarouselState extends State<ImageCarousel> {
                     );
                   },
                 ),
-              ),
-            ),
-          // Botón siguiente
-          if (_currentIndex < widget.images.length - 1)
-            Positioned(
-              right: 8,
-              child: Container(
+              )
+            else
+              const SizedBox(width: 40), // Espacio para mantener centrado el otro botón
+            // Botón siguiente
+            if (_currentIndex < totalImages - 1)
+              Container(
                 decoration: const BoxDecoration(
                   color: Colors.black54,
                   shape: BoxShape.circle,
@@ -150,15 +195,17 @@ class _ImageCarouselState extends State<ImageCarousel> {
                     );
                   },
                 ),
-              ),
-            ),
-        ],
+              )
+            else
+              const SizedBox(width: 40), // Espacio para mantener centrado el otro botón
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildImageIndicators() {
-    if (widget.images.length <= 1) return const SizedBox();
+    if (totalImages <= 1) return const SizedBox();
 
     return Positioned(
       bottom: 8,
@@ -167,7 +214,7 @@ class _ImageCarouselState extends State<ImageCarousel> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: List.generate(
-          widget.images.length,
+          totalImages,
           (index) => Container(
             margin: const EdgeInsets.symmetric(horizontal: 2),
             width: 8,
@@ -185,7 +232,7 @@ class _ImageCarouselState extends State<ImageCarousel> {
   }
 
   Widget _buildRemoveButton() {
-    if (widget.images.isEmpty) return const SizedBox();
+    if (!hasImages) return const SizedBox();
 
     return Positioned(
       top: 8,
@@ -213,7 +260,15 @@ class _ImageCarouselState extends State<ImageCarousel> {
             child: IconButton(
               icon: const Icon(Icons.delete, color: Colors.red, size: 20),
               onPressed: () {
-                widget.onRemoveImage?.call(_currentIndex);
+                // Determinar si es una URL o un archivo local
+                if (_currentIndex < widget.imageUrls.length) {
+                  // Eliminar URL
+                  widget.onRemoveUrl?.call(_currentIndex);
+                } else {
+                  // Eliminar archivo local
+                  final localIndex = _currentIndex - widget.imageUrls.length;
+                  widget.onRemoveImage?.call(localIndex);
+                }
               },
             ),
           ),
