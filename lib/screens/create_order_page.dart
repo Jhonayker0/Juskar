@@ -484,9 +484,10 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
           title: Text(isEditMode ? 'Editar Pedido' : 'Crear Pedido'),
           centerTitle: true,
         ),
-      body: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
+      body: SafeArea(
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
           controller: _scrollController,
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -544,11 +545,12 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
               _buildActionButtons(),
               const SizedBox(height: 20),
             ],
-          ),
-        ),
-      ),
-      ), // Cierre del WillPopScope
-    );
+          ), // Cierra Column
+        ), // Cierra SingleChildScrollView
+      ), // Cierra Form
+    ), // Cierra SafeArea
+  ), // Cierra Scaffold
+); // Cierra PopScope
   }
 
   Widget _buildEditableTitle() {
