@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:juskar/models/order.dart' as OrderModel;
+import 'package:juskar/services/firebase_category_service.dart';
+import 'package:juskar/models/category.dart';
 
 class OrderCard extends StatelessWidget {
   final OrderModel.Order order;
@@ -19,22 +21,6 @@ class OrderCard extends StatelessWidget {
     final dayNames = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
     final dayName = dayNames[order.pedidoFecha.weekday - 1];
     final formattedDate = '$dayName ${order.pedidoFecha.day.toString().padLeft(2, '0')}/${order.pedidoFecha.month.toString().padLeft(2, '0')}';
-    
-    // Determinar color de categoría (básico)
-    Color getCategoryColor(String categoria) {
-      switch (categoria.toLowerCase()) {
-        case 'tortas':
-          return const Color(0xFFE91E63);
-        case 'pasteles':
-          return const Color(0xFF2196F3);
-        case 'cupcakes':
-          return const Color(0xFF4CAF50);
-        case 'panes':
-          return const Color(0xFFFF9800);
-        default:
-          return const Color(0xFF9C27B0);
-      }
-    }
 
     return GestureDetector(
       onTap: onTap,
@@ -92,21 +78,7 @@ class OrderCard extends StatelessWidget {
                   const SizedBox(width: 8),
                   
                   // Chip de categoría
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: getCategoryColor(order.pedidoCategoria),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Text(
-                      order.pedidoCategoria,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
+                  _CategoryChip(categoryId: order.pedidoCategoria),
                 ],
               ),
               
@@ -272,6 +244,73 @@ class OrderCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _CategoryChip extends StatelessWidget {
+  final String categoryId;
+
+  const _CategoryChip({required this.categoryId});
+
+  @override
+  Widget build(BuildContext context) {
+    // Validar que categoryId no esté vacío
+    if (categoryId.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        decoration: BoxDecoration(
+          color: const Color(0xFF607D8B),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: const Text(
+          'Sin categoría',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      );
+    }
+
+    return FutureBuilder<Category?>(
+      future: FirebaseCategoryService.getCategoryById(categoryId),
+      builder: (context, snapshot) {
+        String displayText = 'Cargando...';
+        Color chipColor = const Color(0xFF607D8B);
+
+        if (snapshot.connectionState == ConnectionState.done) {
+          if (snapshot.hasData && snapshot.data != null) {
+            final category = snapshot.data!;
+            displayText = category.nombre;
+            chipColor = category.color; // Usar el color real de la categoría
+          } else if (snapshot.hasError) {
+            displayText = 'Error';
+            chipColor = Colors.red;
+          } else {
+            // No se encontró la categoría
+            displayText = 'Sin categoría';
+            chipColor = const Color(0xFF757575);
+          }
+        }
+
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          decoration: BoxDecoration(
+            color: chipColor,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Text(
+            displayText,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        );
+      },
     );
   }
 }
