@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:juskar/widgets/full_screen_image_viewer.dart';
 
 class ImageCarousel extends StatefulWidget {
   final List<File> images;
@@ -35,6 +36,18 @@ class _ImageCarouselState extends State<ImageCarousel> {
   void dispose() {
     _pageController.dispose();
     super.dispose();
+  }
+
+  void _openFullScreenViewer(int index) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => FullScreenImageViewer(
+          imageUrls: widget.imageUrls,
+          imageFiles: widget.images,
+          initialIndex: index,
+        ),
+      ),
+    );
   }
 
   @override
@@ -107,43 +120,49 @@ class _ImageCarouselState extends State<ImageCarousel> {
           // Primero mostrar las URLs existentes, luego los archivos locales
           if (index < widget.imageUrls.length) {
             // Mostrar imagen desde URL
-            return Image.network(
-              widget.imageUrls[index],
-              fit: BoxFit.cover,
-              loadingBuilder: (context, child, loadingProgress) {
-                if (loadingProgress == null) return child;
-                return const Center(
-                  child: CircularProgressIndicator(
-                    color: Color(0xFF7C7BFF),
-                  ),
-                );
-              },
-              errorBuilder: (context, error, stackTrace) {
-                return const Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.error_outline,
-                        color: Colors.red,
-                        size: 48,
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'Error al cargar imagen',
-                        style: TextStyle(color: Colors.white70),
-                      ),
-                    ],
-                  ),
-                );
-              },
+            return GestureDetector(
+              onTap: () => _openFullScreenViewer(index),
+              child: Image.network(
+                widget.imageUrls[index],
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return const Center(
+                    child: CircularProgressIndicator(
+                      color: Color(0xFF7C7BFF),
+                    ),
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) {
+                  return const Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.error_outline,
+                          color: Colors.red,
+                          size: 48,
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Error al cargar imagen',
+                          style: TextStyle(color: Colors.white70),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
             );
           } else {
             // Mostrar archivo local
             final localIndex = index - widget.imageUrls.length;
-            return Image.file(
-              widget.images[localIndex],
-              fit: BoxFit.cover,
+            return GestureDetector(
+              onTap: () => _openFullScreenViewer(index),
+              child: Image.file(
+                widget.images[localIndex],
+                fit: BoxFit.cover,
+              ),
             );
           }
         },
