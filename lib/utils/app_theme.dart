@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class AppTheme {
   // Colores principales basados en el mockup
   static const Color primaryColor = Color(0xFF7C7BFF); // Púrpura del botón +
-  static const Color backgroundColor = Color(0xFF1E1E1E); // Fondo oscuro
+  static const Color backgroundColor = Color.fromARGB(255, 70, 74, 159); // Fondo oscuro
   static const Color cardColor = Color(0xFF2A2A2A); // Color de las tarjetas
   static const Color textPrimaryColor = Colors.white;
   static const Color textSecondaryColor = Color(0xFFB0B0B0);

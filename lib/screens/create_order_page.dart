@@ -32,7 +32,7 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
   final _abonoController = TextEditingController();
   
   // Variables de estado
-  DateTime _fechaEntrega = DateTime.now().add(const Duration(days: 1));
+  DateTime _fechaEntrega = DateTime.now().add(const Duration(days: 1)).copyWith(hour: 10, minute: 0, second: 0, millisecond: 0);
   String? _selectedCategoryId;
   Category? _selectedCategory;
   bool _pedidoConfirma = false;
@@ -112,9 +112,47 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
     );
 
     if (picked != null) {
-      setState(() {
-        _fechaEntrega = picked;
-      });
+      // Después de seleccionar fecha, seleccionar hora
+      final timePicked = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.fromDateTime(_fechaEntrega),
+        builder: (context, child) {
+          return Theme(
+            data: Theme.of(context).copyWith(
+              colorScheme: const ColorScheme.dark(
+                primary: Color(0xFF7C7BFF),
+                onPrimary: Colors.white,
+                surface: Color(0xFF2A2A2A),
+                onSurface: Colors.white,
+              ),
+            ),
+            child: child!,
+          );
+        },
+      );
+
+      if (timePicked != null) {
+        setState(() {
+          _fechaEntrega = DateTime(
+            picked.year,
+            picked.month,
+            picked.day,
+            timePicked.hour,
+            timePicked.minute,
+          );
+        });
+      } else {
+        // Si no selecciona hora, mantener la hora actual o una hora por defecto
+        setState(() {
+          _fechaEntrega = DateTime(
+            picked.year,
+            picked.month,
+            picked.day,
+            _fechaEntrega.hour,
+            _fechaEntrega.minute,
+          );
+        });
+      }
     }
   }
 
@@ -309,7 +347,7 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
     _valorController.clear();
     _abonoController.text = '0';
     setState(() {
-      _fechaEntrega = DateTime.now().add(const Duration(days: 1));
+      _fechaEntrega = DateTime.now().add(const Duration(days: 1)).copyWith(hour: 10, minute: 0, second: 0, millisecond: 0);
       _selectedCategoryId = null;
       _selectedCategory = null;
       _pedidoConfirma = false;
@@ -621,29 +659,48 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
 
   Widget _buildDateField() {
     final formattedDate = '${_fechaEntrega.day.toString().padLeft(2, '0')}/${_fechaEntrega.month.toString().padLeft(2, '0')}/${_fechaEntrega.year}';
+    final formattedTime = '${_fechaEntrega.hour.toString().padLeft(2, '0')}:${_fechaEntrega.minute.toString().padLeft(2, '0')}';
     
-    return Row(
+    return Column(
       children: [
-        const Icon(Icons.schedule, color: Colors.white),
-        const SizedBox(width: 12),
-        const Text(
-          'Fecha de entrega:',
-          style: TextStyle(color: Colors.white, fontSize: 16),
-        ),
-        const Spacer(),
-        GestureDetector(
-          onTap: _selectDate,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: const Color(0xFF333333),
-              borderRadius: BorderRadius.circular(8),
+        Row(
+          children: [
+            const Icon(Icons.schedule, color: Colors.white),
+            const SizedBox(width: 12),
+            const Text(
+              'Fecha y hora:',
+              style: TextStyle(color: Colors.white, fontSize: 16),
             ),
-            child: Text(
-              formattedDate,
-              style: const TextStyle(color: Colors.white),
+            const Spacer(),
+            GestureDetector(
+              onTap: _selectDate,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF333333),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.calendar_today, color: Colors.white, size: 16),
+                    const SizedBox(width: 8),
+                    Text(
+                      formattedDate,
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                    const SizedBox(width: 12),
+                    Icon(Icons.access_time, color: Colors.white, size: 16),
+                    const SizedBox(width: 8),
+                    Text(
+                      formattedTime,
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
+          ],
         ),
       ],
     );

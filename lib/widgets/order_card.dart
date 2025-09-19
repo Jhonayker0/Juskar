@@ -21,6 +21,15 @@ class OrderCard extends StatelessWidget {
     final dayNames = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
     final dayName = dayNames[order.pedidoFecha.weekday - 1];
     final formattedDate = '$dayName ${order.pedidoFecha.day.toString().padLeft(2, '0')}/${order.pedidoFecha.month.toString().padLeft(2, '0')}';
+    
+    // Formato de hora AM/PM
+    final hour = order.pedidoFecha.hour;
+    final minute = order.pedidoFecha.minute;
+    final period = hour >= 12 ? 'PM' : 'AM';
+    final displayHour = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
+    final formattedTime = '${displayHour.toString()}:${minute.toString().padLeft(2, '0')} $period';
+    
+    final formattedDateTime = '$formattedDate - $formattedTime';
 
     return GestureDetector(
       onTap: onTap,
@@ -129,7 +138,7 @@ class OrderCard extends StatelessWidget {
                   Expanded(
                     flex: 2,
                     child: Text(
-                      formattedDate,
+                      formattedDateTime,
                       style: TextStyle(
                         color: Colors.grey[400],
                         fontSize: 12,

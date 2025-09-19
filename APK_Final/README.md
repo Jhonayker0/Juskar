@@ -1,5 +1,44 @@
 # 📱 Juskar APK - Versiones Disponibles
 
+## 🆕 **Versión v1.0.3 (RECOMENDADA)** - Septiembre 2025
+
+### 🚀 APKs v1.0.3 (Con Selector de Fecha y Hora)
+
+#### **1. Juskar-v1.0.3-universal.apk (RECOMENDADO)**
+- **Tamaño**: 49.4 MB
+- **Compatibilidad**: Todos los dispositivos Android
+- **Descripción**: APK universal que funciona en cualquier dispositivo Android
+- **Uso**: Recomendado para distribución general
+
+#### **2. Juskar-v1.0.3-arm64-v8a.apk (OPTIMIZADO)**
+- **Tamaño**: 18.3 MB
+- **Compatibilidad**: Dispositivos ARM 64-bit (Android modernos)
+- **Descripción**: Optimizado para dispositivos Android modernos (2018+)
+- **Uso**: Para la mayoría de smartphones actuales
+
+#### **3. Juskar-v1.0.3-armeabi-v7a.apk (COMPATIBILIDAD)**
+- **Tamaño**: 15.9 MB
+- **Compatibilidad**: Dispositivos ARM 32-bit (Android más antiguos)
+- **Descripción**: Para dispositivos Android más antiguos
+- **Uso**: Para smartphones anteriores a 2018
+
+#### **4. Juskar-v1.0.3-x86_64.apk (EMULADORES)**
+- **Tamaño**: 19.4 MB
+- **Compatibilidad**: Dispositivos x86_64 y emuladores
+- **Descripción**: Para emuladores Android y tablets x86
+- **Uso**: Para pruebas y dispositivos específicos
+
+### 🎯 **Mejoras en v1.0.3**
+✅ **Selector de hora** - Ahora puedes seleccionar fecha Y hora de entrega
+✅ **Mejor UX** - Interfaz mejorada para selección de fecha/hora
+✅ **Visualización completa** - Las cards muestran fecha y hora de entrega
+✅ **Hora por defecto** - Se establece automáticamente a las 10:00 AM
+✅ **Mantiene SafeArea** - Todas las mejoras de v1.0.2 incluidas
+
+---
+
+## 📂 **Versión v1.0.2** - Con SafeArea Fix
+
 ## 🆕 **Versión v1.0.2 (RECOMENDADA)** - Septiembre 2025
 
 ### 🚀 APKs v1.0.2 (Con SafeArea Fix)
@@ -65,19 +104,20 @@
 ✅ **Logo actualizado** (versión 1.0.1+)
 ✅ **Optimización** tree-shaking de iconos (99.7% reducción)
 ✅ **SafeArea Fix** - No hay superposición con botones del sistema (v1.0.2)
+✅ **Selector de fecha y hora** - Completa gestión de fechas de entrega (v1.0.3)
 
 ## 🔧 Detalles Técnicos
 
 - **Framework**: Flutter 3.9.2
 - **Backend**: Firebase Suite
-- **Versión Actual**: 1.0.2+2 (Recomendada)
-- **Versión Anterior**: 1.0.1+1 (Disponible)
+- **Versión Actual**: 1.0.3+3 (Recomendada)
+- **Versiones Anteriores**: 1.0.2+2, 1.0.1+1 (Disponibles)
 - **Target SDK**: Android API 21+ (Android 5.0+)
 - **Build Type**: Release optimizado
 
 ## 📥 Instalación
 
-1. Descarga el APK recomendado: `Juskar-v1.0.2-universal.apk`
+1. Descarga el APK recomendado: `Juskar-v1.0.3-universal.apk`
 2. Habilita "Instalar desde fuentes desconocidas" en tu Android
 3. Instala el APK
 4. ¡Disfruta de Juskar!
@@ -88,6 +128,7 @@
 - La aplicación requiere **permisos de cámara** para tomar fotos
 - **Firebase** requiere conexión a internet para funcionar
 - Iconos **completamente cuadrados** (0dp radio) como solicitado
+- **v1.0.3** incluye selector de hora para fechas de entrega
 - **v1.0.2** soluciona problemas de superposición con botones del sistema Android
 
 ---
