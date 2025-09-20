@@ -6,7 +6,7 @@ class AppTheme {
   static const Color backgroundColor = Color.fromARGB(255, 70, 74, 159); // Fondo oscuro
   static const Color cardColor = Color(0xFF2A2A2A); // Color de las tarjetas
   static const Color textPrimaryColor = Colors.white;
-  static const Color textSecondaryColor = Color(0xFFB0B0B0);
+  static const Color textSecondaryColor = Color.fromARGB(255, 233, 228, 228);
   static const Color searchBarColor = Color(0xFF333333);
   
   // Colores de estado (categorías)

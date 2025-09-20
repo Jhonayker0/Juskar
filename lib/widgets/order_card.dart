@@ -93,16 +93,30 @@ class OrderCard extends StatelessWidget {
               
               const SizedBox(height: 12),
               
-              // Detalles del pedido
-              Text(
-                order.pedidoDetalle,
-                style: TextStyle(
-                  color: Colors.grey[300],
-                  fontSize: 14,
+              // Peso del pedido
+              if (order.pedidoLibras.isNotEmpty) 
+                Row(
+                  children: [
+                    Icon(
+                      Icons.scale,
+                      size: 16,
+                      color: Colors.grey[400],
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Peso: ${order.pedidoLibras}',
+                        style: TextStyle(
+                          color: Colors.grey[300],
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        softWrap: true,
+                        overflow: TextOverflow.visible,
+                      ),
+                    ),
+                  ],
                 ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
               
               if (order.pedidoLeyenda.isNotEmpty) ...[
                 const SizedBox(height: 8),
@@ -147,26 +161,21 @@ class OrderCard extends StatelessWidget {
                     ),
                   ),
                   
-                  // Peso - hacer más compacto
-                  if (order.pedidoLibras.isNotEmpty) ...[
-                    const SizedBox(width: 4),
-                    Icon(
-                      Icons.scale,
-                      size: 14,
-                      color: Colors.grey[400],
-                    ),
-                    const SizedBox(width: 2),
-                    Flexible(
+                  // Descripción - compacta
+                  if (order.pedidoDetalle.isNotEmpty) ...[
+                    const SizedBox(width: 8),
+                    Expanded(
+                      flex: 2,
                       child: Text(
-                        '${order.pedidoLibras}lb',
+                        order.pedidoDetalle,
                         style: TextStyle(
                           color: Colors.grey[400],
                           fontSize: 11,
                         ),
+                        maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    const SizedBox(width: 4),
                   ],
                   
                   // Precio - hacer más compacto

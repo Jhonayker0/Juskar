@@ -871,12 +871,8 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
           validator: (value) {
             if (value != null && value.isNotEmpty) {
               final abono = double.tryParse(value);
-              final valor = double.tryParse(_valorController.text);
               if (abono == null) {
                 return 'Ingresa un abono válido';
-              }
-              if (valor != null && abono > valor) {
-                return 'El abono no puede ser mayor al valor total';
               }
             }
             return null;
