@@ -69,19 +69,18 @@ class FirebaseStorageService {
     }
   }
 
-  /// Seleccionar imagen desde galería
-  static Future<File?> pickImageFromGallery() async {
+  /// Seleccionar una o varias imágenes desde galería
+  static Future<List<File>?> pickImagesFromGallery() async {
     try {
       final picker = ImagePicker();
-      final pickedFile = await picker.pickImage(
-        source: ImageSource.gallery,
+      final pickedFiles = await picker.pickMultiImage(
         maxWidth: 1024,
         maxHeight: 1024,
         imageQuality: 85,
       );
 
-      if (pickedFile != null) {
-        return File(pickedFile.path);
+      if (pickedFiles.isNotEmpty) {
+        return pickedFiles.map((file) => File(file.path)).toList();
       }
       return null;
     } catch (e) {
@@ -110,14 +109,14 @@ class FirebaseStorageService {
   }
 
   /// Mostrar diálogo para seleccionar fuente de imagen
-  static Future<File?> showImageSourceDialog(BuildContext context) async {
+  static Future<List<File>?> showImageSourceDialog(BuildContext context) async {
     final String? result = await showDialog<String?>(
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
           backgroundColor: const Color(0xFF2A2A2A),
           title: const Text(
-            'Seleccionar imagen',
+            'Seleccionar imágenes',
             style: TextStyle(color: Colors.white),
           ),
           content: Column(
@@ -147,9 +146,10 @@ class FirebaseStorageService {
     if (result == null) return null;
     
     if (result == 'gallery') {
-      return await pickImageFromGallery();
+      return await pickImagesFromGallery();
     } else if (result == 'camera') {
-      return await pickImageFromCamera();
+      final image = await pickImageFromCamera();
+      return image == null ? null : [image];
     }
     
     return null;

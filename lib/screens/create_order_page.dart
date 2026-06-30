@@ -164,12 +164,12 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
         _isUploadingImage = true;
       });
 
-      final image = await FirebaseStorageService.showImageSourceDialog(context);
+      final images = await FirebaseStorageService.showImageSourceDialog(context);
       
       if (mounted) {
         setState(() {
-          if (image != null) {
-            _selectedImages.add(image);
+          if (images != null && images.isNotEmpty) {
+            _selectedImages.addAll(images);
           }
           _isUploadingImage = false;
         });
