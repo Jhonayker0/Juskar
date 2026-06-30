@@ -1,32 +1,61 @@
 # 📱 Juskar APK - Versiones Disponibles
 
-## 🆕 **Versión v1.0.4 (RECOMENDADA)** - Septiembre 2025
+## 🆕 **Versión v1.0.5 (RECOMENDADA)** - Septiembre 2025
 
-### 🚀 APKs v1.0.4 (Mejoras UX y Formato AM/PM)
+### 🚀 APKs v1.0.5 (Fix Overflow Lista Categorías)
 
-#### **1. Juskar-v1.0.4-universal.apk (RECOMENDADO)**
+#### **1. Juskar-v1.0.5-universal.apk (RECOMENDADO)**
 - **Tamaño**: 49.4 MB
 - **Compatibilidad**: Todos los dispositivos Android
 - **Descripción**: APK universal que funciona en cualquier dispositivo Android
 - **Uso**: Recomendado para distribución general
 
-#### **2. Juskar-v1.0.4-arm64-v8a.apk (OPTIMIZADO)**
+#### **2. Juskar-v1.0.5-arm64-v8a.apk (OPTIMIZADO)**
 - **Tamaño**: 18.3 MB
 - **Compatibilidad**: Dispositivos ARM 64-bit (Android modernos)
 - **Descripción**: Optimizado para dispositivos Android modernos (2018+)
 - **Uso**: Para la mayoría de smartphones actuales
 
-#### **3. Juskar-v1.0.4-armeabi-v7a.apk (COMPATIBILIDAD)**
+#### **3. Juskar-v1.0.5-armeabi-v7a.apk (COMPATIBILIDAD)**
 - **Tamaño**: 15.9 MB
 - **Compatibilidad**: Dispositivos ARM 32-bit (Android más antiguos)
 - **Descripción**: Para dispositivos Android más antiguos
 - **Uso**: Para smartphones anteriores a 2018
 
-#### **4. Juskar-v1.0.4-x86_64.apk (EMULADORES)**
+#### **4. Juskar-v1.0.5-x86_64.apk (EMULADORES)**
 - **Tamaño**: 19.4 MB
 - **Compatibilidad**: Dispositivos x86_64 y emuladores
 - **Descripción**: Para emuladores Android y tablets x86
 - **Uso**: Para pruebas y dispositivos específicos
+
+### 🎯 **Mejoras en v1.0.5**
+✅ **Fix Overflow Lista** - Solucionado problema de "bottom overflowed" en lista de categorías
+✅ **Scroll Mejorado** - Lista de categorías ahora permite scroll correcto sin overflow
+✅ **Modal Optimizado** - BottomSheet de categorías con altura máxima del 70% de pantalla
+✅ **ListView Implementado** - Cambio de Column a ListView.builder para mejor rendimiento
+✅ **UX Estable** - Experiencia sin errores visuales al navegar por categorías
+
+---
+
+## 📂 **Versión v1.0.4** - Mejoras UX y Formato AM/PM
+
+### 🚀 APKs v1.0.4
+
+#### **1. Juskar-v1.0.4-universal.apk**
+- **Tamaño**: 49.4 MB
+- **Compatibilidad**: Todos los dispositivos Android
+
+#### **2. Juskar-v1.0.4-arm64-v8a.apk**
+- **Tamaño**: 18.3 MB
+- **Compatibilidad**: Dispositivos ARM 64-bit
+
+#### **3. Juskar-v1.0.4-armeabi-v7a.apk**
+- **Tamaño**: 15.9 MB
+- **Compatibilidad**: Dispositivos ARM 32-bit
+
+#### **4. Juskar-v1.0.4-x86_64.apk**
+- **Tamaño**: 19.4 MB
+- **Compatibilidad**: Dispositivos x86_64
 
 ### 🎯 **Mejoras en v1.0.4**
 ✅ **Formato AM/PM** - Hora mostrada en formato de 12 horas más intuitivo
@@ -137,19 +166,20 @@
 ✅ **Formato AM/PM** - Hora en formato de 12 horas más intuitivo (v1.0.4)
 ✅ **Layout optimizado** - Peso y descripción intercambiados para mejor visibilidad (v1.0.4)
 ✅ **Sin restricción de pago** - Removida validación limitante de pagos (v1.0.4)
+✅ **Fix Overflow** - Solucionado problema de scroll en lista de categorías (v1.0.5)
 
 ## 🔧 Detalles Técnicos
 
 - **Framework**: Flutter 3.9.2
 - **Backend**: Firebase Suite
-- **Versión Actual**: 1.0.4+4 (Recomendada)
-- **Versiones Anteriores**: 1.0.3+3, 1.0.2+2, 1.0.1+1 (Disponibles)
+- **Versión Actual**: 1.0.5+5 (Recomendada)
+- **Versiones Anteriores**: 1.0.4+4, 1.0.3+3, 1.0.2+2, 1.0.1+1 (Disponibles)
 - **Target SDK**: Android API 21+ (Android 5.0+)
 - **Build Type**: Release optimizado
 
 ## 📥 Instalación
 
-1. Descarga el APK recomendado: `Juskar-v1.0.4-universal.apk`
+1. Descarga el APK recomendado: `Juskar-v1.0.5-universal.apk`
 2. Habilita "Instalar desde fuentes desconocidas" en tu Android
 3. Instala el APK
 4. ¡Disfruta de Juskar!
@@ -160,6 +190,7 @@
 - La aplicación requiere **permisos de cámara** para tomar fotos
 - **Firebase** requiere conexión a internet para funcionar
 - Iconos **completamente cuadrados** (0dp radio) como solicitado
+- **v1.0.5** soluciona el problema de overflow en lista de categorías
 - **v1.0.4** incluye formato AM/PM y mejoras UX importantes
 - **v1.0.3** incluye selector de hora para fechas de entrega
 - **v1.0.2** soluciona problemas de superposición con botones del sistema Android

@@ -219,8 +219,12 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
+      isScrollControlled: true,
       builder: (context) {
         return Container(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.7,
+          ),
           padding: const EdgeInsets.all(20),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -235,58 +239,67 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
                 ),
               ),
               const SizedBox(height: 16),
-              StreamBuilder<List<Category>>(
-                stream: FirebaseCategoryService.getCategories(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) {
-                    return const Text(
-                      'Error al cargar categorías',
-                      style: TextStyle(color: Colors.red),
-                    );
-                  }
-
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  final categories = snapshot.data ?? [];
-
-                  if (categories.isEmpty) {
-                    return const Text(
-                      'No hay categorías disponibles',
-                      style: TextStyle(color: Colors.grey),
-                    );
-                  }
-
-                  return Column(
-                    children: categories.map((category) {
-                      return ListTile(
-                        leading: Container(
-                          width: 20,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            color: category.color,
-                            shape: BoxShape.circle,
-                          ),
+              Expanded(
+                child: StreamBuilder<List<Category>>(
+                  stream: FirebaseCategoryService.getCategories(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return const Center(
+                        child: Text(
+                          'Error al cargar categorías',
+                          style: TextStyle(color: Colors.red),
                         ),
-                        title: Text(
-                          category.nombre,
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                        trailing: _selectedCategoryId == category.id
-                            ? const Icon(Icons.check, color: Color(0xFF7C7BFF))
-                            : null,
-                        onTap: () {
-                          setState(() {
-                            _selectedCategoryId = category.id;
-                            _selectedCategory = category;
-                          });
-                          Navigator.pop(context);
-                        },
                       );
-                    }).toList(),
-                  );
-                },
+                    }
+
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    final categories = snapshot.data ?? [];
+
+                    if (categories.isEmpty) {
+                      return const Center(
+                        child: Text(
+                          'No hay categorías disponibles',
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      );
+                    }
+
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: categories.length,
+                      itemBuilder: (context, index) {
+                        final category = categories[index];
+                        return ListTile(
+                          leading: Container(
+                            width: 20,
+                            height: 20,
+                            decoration: BoxDecoration(
+                              color: category.color,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          title: Text(
+                            category.nombre,
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                          trailing: _selectedCategoryId == category.id
+                              ? const Icon(Icons.check, color: Color(0xFF7C7BFF))
+                              : null,
+                          onTap: () {
+                            setState(() {
+                              _selectedCategoryId = category.id;
+                              _selectedCategory = category;
+                            });
+                            Navigator.pop(context);
+                          },
+                        );
+                      },
+                    );
+                  },
+                ),
               ),
             ],
           ),
