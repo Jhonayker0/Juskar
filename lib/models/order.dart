@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Order {
   final String id;
-  final String? imageFoto;
+  final List<String> imagenesUrls; // Cambiado de String? a List<String>
   final double pedidoAbono;
   final String pedidoCliente;
   final bool pedidoCompleto; // 1 = true, 0 = false
@@ -18,7 +18,7 @@ class Order {
 
   Order({
     required this.id,
-    this.imageFoto,
+    this.imagenesUrls = const [], // Lista vacía por defecto
     required this.pedidoAbono,
     required this.pedidoCliente,
     required this.pedidoCompleto,
@@ -65,10 +65,21 @@ class Order {
       if (value is String) return double.tryParse(value) ?? 0.0;
       return 0.0;
     }
+    // Función helper para convertir a List<String> de manera segura
+    List<String> safeStringList(dynamic value) {
+      if (value == null) return [];
+      if (value is List) {
+        return value.map((e) => e.toString()).toList();
+      }
+      if (value is String && value.isNotEmpty) {
+        return [value]; // Compatibilidad con formato anterior
+      }
+      return [];
+    }
     
     return Order(
       id: doc.id,
-      imageFoto: safeString(data['imageFoto']),
+      imagenesUrls: safeStringList(data['imagenesUrls'] ?? data['imageFoto']), // Compatibilidad
       pedidoAbono: safeDouble(data['pedidoAbono']),
       pedidoCliente: safeString(data['pedidoCliente']),
       pedidoCompleto: safeBool(data['pedidoCompleto']),
@@ -89,7 +100,7 @@ class Order {
   // Método para convertir a Map para Firestore
   Map<String, dynamic> toFirestore() {
     return {
-      'imageFoto': imageFoto,
+      'imagenesUrls': imagenesUrls,
       'pedidoAbono': pedidoAbono,
       'pedidoCliente': pedidoCliente,
       'pedidoCompleto': pedidoCompleto ? 1 : 0,
@@ -109,7 +120,7 @@ class Order {
   // Copia del objeto con algunos campos modificados
   Order copyWith({
     String? id,
-    String? imageFoto,
+    List<String>? imagenesUrls,
     double? pedidoAbono,
     String? pedidoCliente,
     bool? pedidoCompleto,
@@ -125,7 +136,7 @@ class Order {
   }) {
     return Order(
       id: id ?? this.id,
-      imageFoto: imageFoto ?? this.imageFoto,
+      imagenesUrls: imagenesUrls ?? this.imagenesUrls,
       pedidoAbono: pedidoAbono ?? this.pedidoAbono,
       pedidoCliente: pedidoCliente ?? this.pedidoCliente,
       pedidoCompleto: pedidoCompleto ?? this.pedidoCompleto,

@@ -134,6 +134,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: "categories_fab", // Tag único para evitar conflictos
         onPressed: _createCategory,
         child: const Icon(Icons.add),
       ),
@@ -141,6 +142,8 @@ class _CategoriesPageState extends State<CategoriesPage> {
   }
 
   void _createCategory() async {
+    if (!mounted) return;
+    
     final result = await Navigator.of(context).push<Category>(
       MaterialPageRoute(
         builder: (context) => const CreateEditCategoryPage(),
@@ -150,19 +153,23 @@ class _CategoriesPageState extends State<CategoriesPage> {
     if (result != null && mounted) {
       try {
         await FirebaseCategoryService.addCategory(result);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Categoría "${result.nombre}" creada exitosamente'),
-            backgroundColor: Colors.green,
-          ),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Categoría "${result.nombre}" creada exitosamente'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error al crear categoría: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error al crear categoría: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
     }
   }

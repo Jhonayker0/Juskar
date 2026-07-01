@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:juskar/utils/app_theme.dart';
 import 'package:juskar/screens/main_layout.dart';
-import 'package:juskar/utils/firebase_test_data.dart';
 import 'firebase_options.dart';
 
 void main() async {

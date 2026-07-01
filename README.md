@@ -1,117 +1,123 @@
-# Juskar - Aplicación de Repostería 🧁
+# Juskar - Gestión de pedidos de repostería
 
-Una aplicación móvil para gestionar pedidos de repostería, desarrollada con Flutter.
+Juskar es una aplicación móvil desarrollada con Flutter para administrar pedidos de repostería de forma centralizada. La app utiliza Firebase como base para autenticación de servicios, almacenamiento de datos y gestión de imágenes.
 
-## 📱 Funcionalidades
+## Funcionalidades principales
 
-### Pantallas Principales
-- **Home Page**: Visualización de pedidos con filtros y búsqueda
-- **Create Order**: Creación de nuevos pedidos (próximamente)
-- **Categories**: Gestión de categorías personalizables
+- Gestión de pedidos con creación, edición y eliminación.
+- Asociación de cada pedido a una categoría personalizable.
+- Registro de cliente, contacto, domicilio, descripción, leyenda, libras, valor, abono, fecha de entrega y estado del pedido.
+- Carga de múltiples imágenes por pedido.
+- Visualización de imágenes en carrusel dentro de cada pedido.
+- Confirmación visual de pedidos completados o pendientes.
+- Navegación principal con acceso a inicio, creación de pedidos y categorías.
+- Gestión de categorías con color personalizado.
+- Pantalla de analítica con filtros por rango de fechas y agrupación por días, semanas, meses, trimestres, semestres y años.
+- Gráficas interactivas para revisar ventas y comportamiento de pedidos.
 
-### Características Implementadas
-- ✅ Interfaz oscura moderna
-- ✅ Lista de pedidos con datos mockup
-- ✅ Categorías de colores personalizables
-- ✅ Botón de completado/pendiente para cada pedido
-- ✅ Navegación con bottom navigation bar
-- ✅ Diseño responsive
+## Capturas de pantalla
 
-## 🏗️ Estructura del Proyecto
+Guarda las imágenes en la carpeta `docs/screenshots/` y referencia cada archivo en el README con una ruta relativa. El formato recomendado es:
 
+```markdown
+![Texto alternativo](docs/screenshots/nombre-de-la-imagen.png)
 ```
+
+Si la carpeta no existe, puedes crearla manualmente antes de copiar las capturas.
+
+### Pantalla principal
+
+![Pantalla principal](docs/screenshots/home.png)
+
+### Creación y edición de pedidos
+
+![Creación y edición de pedidos](docs/screenshots/create-order.png)
+
+### Gestión de categorías
+
+![Gestión de categorías](docs/screenshots/categories.png)
+![Creación de categorías](docs/screenshots/create-categories.png)
+
+### Analítica
+
+![Analítica](docs/screenshots/analytics.png)
+![Analítica](docs/screenshots/analytics-2.png)
+
+## Tecnologías utilizadas
+
+- Flutter
+- Dart
+- Firebase Core
+- Cloud Firestore
+- Firebase Storage
+- Firebase Analytics
+- image_picker
+- intl
+
+## Estructura general del proyecto
+
+```text
 lib/
+├── main.dart
+├── firebase_options.dart
 ├── models/
-│   ├── category.dart          # Modelo de categoría
-│   └── order.dart            # Modelo de pedido
+│   ├── category.dart
+│   └── order.dart
 ├── screens/
-│   ├── home_page.dart        # Pantalla principal
-│   ├── create_order_page.dart # Crear pedido
-│   ├── categories_page.dart   # Gestión de categorías
-│   └── main_layout.dart      # Layout principal con navegación
-├── widgets/
-│   └── order_card.dart       # Widget de tarjeta de pedido
+│   ├── analytics_page.dart
+│   ├── categories_page.dart
+│   ├── create_edit_category_page.dart
+│   ├── create_order_page.dart
+│   ├── home_page.dart
+│   └── main_layout.dart
 ├── services/
-│   ├── firebase_category_service.dart # Servicio de categorías con Firebase
-│   └── firebase_order_service.dart    # Servicio de pedidos con Firebase
+│   ├── firebase_category_service.dart
+│   ├── firebase_order_service.dart
+│   └── firebase_storage_service.dart
 ├── utils/
-│   └── app_theme.dart        # Tema y colores de la app
-└── main.dart                 # Punto de entrada
+│   └── app_theme.dart
+└── widgets/
+    ├── image_carousel.dart
+    ├── order_card.dart
+    └── full_screen_image_viewer.dart
 ```
 
-## 📦 Modelos de Datos
+## Configuración del entorno
 
-### Pedido (Order)
-- **Título**: Nombre del pedido
-- **Descripción**: Detalles del pedido
-- **Fecha**: Fecha de entrega
-- **Categoría**: Categoría asignada (con color)
-- **Cliente**: Nombre del cliente
-- **Contacto**: Teléfono de contacto
-- **Tamaño**: Tamaño del pedido
-- **Leyenda**: Texto para el pastel/producto
-- **Edad**: Edad del cumpleañero (si aplica)
-- **Valor**: Precio total
-- **Abono**: Cantidad abonada
-- **Domicilio**: Dirección de entrega
-- **Completado**: Estado del pedido (true/false)
+### Requisitos previos
 
-### Categoría (Category)
-- **ID**: Identificador único
-- **Nombre**: Nombre de la categoría
-- **Color**: Color asociado a la categoría
+- Flutter instalado y configurado.
+- Proyecto de Firebase creado y vinculado.
+- Android Studio o un entorno compatible para compilar Android.
 
-## 🎨 Tema Visual
 
-### Paleta de Colores
-- **Fondo**: `#1E1E1E` (Negro oscuro)
-- **Tarjetas**: `#2A2A2A` (Gris oscuro)
-- **Color Primario**: `#7C7BFF` (Púrpura)
-- **Texto Principal**: Blanco
-- **Texto Secundario**: `#B0B0B0` (Gris claro)
+## Instalación y ejecución
 
-### Categorías por Color
-- **No confirmado**: Azul púrpura
-- **Cupcake**: Rojo
-- **Pendiente**: Naranja
-- **Arequipe**: Rosa
-- **Confirmado**: Verde turquesa
-- **Chocolate**: Café
+1. Instalar dependencias:
+   ```bash
+   flutter pub get
+   ```
 
-## 🚀 Datos de Prueba
+2. Ejecutar la aplicación en modo desarrollo:
+   ```bash
+   flutter run
+   ```
 
-La aplicación incluye datos mockup para visualizar la funcionalidad:
-- 5 pedidos de ejemplo
-- 6 categorías predefinidas
-- Diferentes estados (completado/pendiente)
+3. Generar un APK de release:
+   ```bash
+   flutter build apk --release
+   ```
 
-## 🔮 Próximas Implementaciones
+## Notas de uso
 
-1. **Funcionalidad de Búsqueda**: Filtrar pedidos por título o cliente
-2. **Filtros Avanzados**: Por categoría, fecha, estado
-3. **Formulario de Creación**: Pantalla completa para crear pedidos
-4. **Edición de Pedidos**: Modificar pedidos existentes
-5. **Gestión de Categorías**: Agregar, editar, eliminar categorías
-6. **Integración con Firebase**: Base de datos en la nube
-7. **Notificaciones**: Recordatorios de fechas de entrega
-8. **Reportes**: Estadísticas de ventas y pedidos
+- La app está orientada a la gestión interna de pedidos de repostería.
+- Las fechas, horas y textos visibles en la interfaz están configurados en español.
+- La pantalla de analítica permite revisar el comportamiento de ventas según el rango seleccionado.
+- La carga de imágenes por pedido admite múltiples archivos desde la galería.
 
-## 🛠️ Tecnologías
+## Estado del proyecto
 
-- **Flutter**: Framework de desarrollo
-- **Dart**: Lenguaje de programación
-- **Provider**: Gestión de estado (preparado)
-- **Material Design**: Componentes de interfaz
-
-## 📋 Instalación
-
-1. Clonar el repositorio
-2. Ejecutar `flutter pub get`
-3. Ejecutar `flutter run`
-
-## 👨‍💻 Desarrollo
-
-El proyecto está estructurado de manera modular para facilitar el desarrollo incremental. Cada funcionalidad se puede implementar de forma independiente.
+El proyecto incluye las funciones principales necesarias para operar pedidos, categorías, imágenes y analítica básica. La documentación y las capturas pueden ampliarse según el flujo real de trabajo del negocio.
 
 ---
 

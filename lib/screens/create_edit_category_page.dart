@@ -55,9 +55,10 @@ class _CreateEditCategoryPageState extends State<CreateEditCategoryPage> {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Campo nombre
@@ -217,9 +218,10 @@ class _CreateEditCategoryPageState extends State<CreateEditCategoryPage> {
               ],
             ),
           ],
-        ),
-      ),
-    );
+        ), // Cierra Column
+      ), // Cierra Padding
+    ), // Cierra SafeArea
+  ); // Cierra Scaffold
   }
 
   void _saveCategory() {
