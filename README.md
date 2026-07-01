@@ -27,21 +27,21 @@ Si la carpeta no existe, puedes crearla manualmente antes de copiar las capturas
 
 ### Pantalla principal
 
-![Pantalla principal](docs/screenshots/home.png)
+<img src="docs/screenshots/home.png" alt="Pantalla principal" width="720" />
 
 ### Creación y edición de pedidos
 
-![Creación y edición de pedidos](docs/screenshots/create-order.png)
+<img src="docs/screenshots/create-order.png" alt="Creación y edición de pedidos" width="720" />
 
 ### Gestión de categorías
 
-![Gestión de categorías](docs/screenshots/categories.png)
-![Creación de categorías](docs/screenshots/create-categories.png)
+<img src="docs/screenshots/categories.png" alt="Gestión de categorías" width="720" />
+<img src="docs/screenshots/create-categories.png" alt="Creación de categorías" width="720" />
 
 ### Analítica
 
-![Analítica](docs/screenshots/analytics.png)
-![Analítica](docs/screenshots/analytics-2.png)
+<img src="docs/screenshots/analytics.png" alt="Analítica" width="720" />
+<img src="docs/screenshots/analytics-2.png" alt="Analítica 2" width="720" />
 
 ## Tecnologías utilizadas
 
