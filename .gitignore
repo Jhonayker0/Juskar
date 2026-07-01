@@ -32,6 +32,14 @@ migrate_working_dir/
 .pub/
 /build/
 /coverage/
+*.apk
+APK_Final/*.apk
+
+# Local Android configuration and signing files
+**/local.properties
+**/key.properties
+**/*.jks
+**/*.keystore
 
 # Symbolication related
 app.*.symbols
