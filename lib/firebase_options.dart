@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDaqZ1IxzlubBf6AoeiEzINgXygd2qjSyg',
+    apiKey: '',
     appId: '1:36618662000:android:dde448b4c79e2cf11444b5',
     messagingSenderId: '36618662000',
     projectId: 'todocake-69104',
