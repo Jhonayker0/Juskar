@@ -15,19 +15,9 @@ Juskar es una aplicación móvil desarrollada con Flutter para administrar pedid
 - Pantalla de analítica con filtros por rango de fechas y agrupación por días, semanas, meses, trimestres, semestres y años.
 - Gráficas interactivas para revisar ventas y comportamiento de pedidos.
 
-## Capturas de pantalla
-
-Guarda las imágenes en la carpeta `docs/screenshots/` y referencia cada archivo en el README con una ruta relativa. El formato recomendado es:
-
-```markdown
-![Texto alternativo](docs/screenshots/nombre-de-la-imagen.png)
-```
-
-Si la carpeta no existe, puedes crearla manualmente antes de copiar las capturas.
-
 ### Pantalla principal
 
-<img src="docs/screenshots/home.png" alt="Pantalla principal" width="720" />
+<img src="docs/screenshots/home.png" alt="Pantalla principal" width="360" />
 
 ### Creación y edición de pedidos
 
