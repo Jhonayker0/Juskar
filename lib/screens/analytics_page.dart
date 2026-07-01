@@ -30,6 +30,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
     decimalDigits: 0,
   );
 
+  final GlobalKey _chartKey = GlobalKey();
   AnalyticsGrouping _grouping = AnalyticsGrouping.months;
   DateTimeRange? _selectedRange;
   int? _selectedPointIndex;
@@ -200,19 +201,21 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
             )
           else
             SizedBox(
+              key: _chartKey,
               height: 240,
+              width: double.infinity,
               child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
                 onTapDown: (details) {
-                  final box = context.findRenderObject() as RenderBox?;
+                  final box = _chartKey.currentContext?.findRenderObject() as RenderBox?;
                   if (box == null) return;
                   final localPosition = box.globalToLocal(details.globalPosition);
-                  final width = box.size.width - 48;
-                  if (width <= 0) return;
-                  final chartLeft = 24.0;
-                  final chartRight = 24.0;
+                  const chartLeft = 24.0;
+                  const chartRight = 24.0;
                   final chartWidth = box.size.width - chartLeft - chartRight;
-                  final dx = localPosition.dx.clamp(chartLeft, box.size.width - chartRight);
-                  final relativeX = (dx - chartLeft) / chartWidth;
+                  if (chartWidth <= 0) return;
+                  final clampedDx = localPosition.dx.clamp(chartLeft, box.size.width - chartRight);
+                  final relativeX = (clampedDx - chartLeft) / chartWidth;
                   final index = (relativeX * (points.length - 1)).round().clamp(0, points.length - 1);
                   setState(() {
                     _selectedPointIndex = index;
@@ -223,7 +226,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                     points: points,
                     selectedIndex: _selectedPointIndex,
                   ),
-                  child: Container(),
+                  child: const SizedBox.expand(),
                 ),
               ),
             ),
