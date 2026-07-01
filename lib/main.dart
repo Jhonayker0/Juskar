@@ -25,6 +25,31 @@ class JuskarApp extends StatelessWidget {
     return MaterialApp(
       title: 'Juskar - Repostería',
       theme: AppTheme.darkTheme,
+      builder: (context, child) {
+        return Stack(
+          children: [
+            const DecoratedBox(
+              decoration: BoxDecoration(
+                color: AppTheme.backgroundColor,
+              ),
+              child: SizedBox.expand(),
+            ),
+            Center(
+              child: IgnorePointer(
+                child: Opacity(
+                  opacity: 0.7,
+                  child: Image.asset(
+                    'assets/LogoJuskar.png',
+                    width: 240,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+            ),
+            if (child != null) child,
+          ],
+        );
+      },
       home: const MainLayout(),
       debugShowCheckedModeBanner: false,
     );
