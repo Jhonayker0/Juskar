@@ -17,21 +17,21 @@ Juskar es una aplicación móvil desarrollada con Flutter para administrar pedid
 
 ### Pantalla principal
 
-<img src="docs/screenshots/home.png" alt="Pantalla principal" width="360" />
+<img src="docs/screenshots/home.png" alt="Pantalla principal" width="300" />
 
 ### Creación y edición de pedidos
 
-<img src="docs/screenshots/create-order.png" alt="Creación y edición de pedidos" width="720" />
+<img src="docs/screenshots/create-order.png" alt="Creación y edición de pedidos" width="300" />
 
 ### Gestión de categorías
 
-<img src="docs/screenshots/categories.png" alt="Gestión de categorías" width="720" />
-<img src="docs/screenshots/create-categories.png" alt="Creación de categorías" width="720" />
+<img src="docs/screenshots/categories.png" alt="Gestión de categorías" width="300" />
+<img src="docs/screenshots/create-categories.png" alt="Creación de categorías" width="300" />
 
 ### Analítica
 
-<img src="docs/screenshots/analytics.png" alt="Analítica" width="720" />
-<img src="docs/screenshots/analytics-2.png" alt="Analítica 2" width="720" />
+<img src="docs/screenshots/analytics.png" alt="Analítica" width="300" />
+<img src="docs/screenshots/analytics-2.png" alt="Analítica 2" width="300" />
 
 ## Tecnologías utilizadas
 
